@@ -1,6 +1,6 @@
 const myName = 'relayManager',
 	debug = (process.argv[3] == 'debug'),
-	gpio = require('onoff').Gpio,
+	// gpio = require('onoff').Gpio,
 	support = require('./lib/support'),
 	vcb = require('./lib/vocab'),
 	NYI = 'Not Yet Implemented',
@@ -23,7 +23,7 @@ let
 
 exports.neuron = {
 	system: {
-		debugAll: debug,
+		debugAll: true,
 		outputDebugAt: (debug) ? 0 : 5,
 		version: '1.0',
 		beforeBoot: function(config, dispatcher, globals, allDone) {
