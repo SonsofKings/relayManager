@@ -1,7 +1,7 @@
 const myName = 'relayManager',
 	debug = (process.argv[3] == 'debug'),
 	gpio = require('onoff').Gpio,
-	// support = require('./lib/support'),
+	support = require('./lib/support'),
 	vcb = require('./lib/vocab'),
 	NYI = 'Not Yet Implemented',
 	// errMsgs = {},
@@ -9,8 +9,6 @@ const myName = 'relayManager',
 		uplinkHost: '127.0.0.1',
 		uplinkPort: 8000,
 		ivKey: 'passw0rd',
-		// targetAddr: '127.0.0.1',
-		// targetPort: 8080,
 		relayList: [
 			{name: 'relay-1'},
 			{name: 'relay-2'},
@@ -22,6 +20,7 @@ let
 	conf,
 	cFile,
 	rest;
+
 exports.neuron = {
 	system: {
 		debugAll: debug,
@@ -31,12 +30,13 @@ exports.neuron = {
 			cFile = dispatcher.utilities.configFile;
 			conf = cFile.get(confTemplate);
 
+			console.log(conf);			
+
 			config.interneuron.ivKey = conf.ivKey;
 			config.interneuron.connectTo.host = conf.uplinkHost;
 			config.interneuron.connectTo.port = conf.uplinkPort;
 
 			globals.relayCount = conf.relayList.length;
-			globals.openS = openS;
 			globals.support = support;
 			globals.vcb = vcb;
 			allDone(false, config, dispatcher, globals);
@@ -51,67 +51,63 @@ exports.neuron = {
 		outflow: ['statusUpdate'],
 		controls: {
 			subscriptions: {
-				onSubscriber: 'newSubscribtion',
+				onSubscriber: 'newSubscription',
 				published: {statusUpdate: 'Emitted everytime a relay status changes'},
 				allowAll: true
 			}
 		}
 	},
 
-	resources: [{name: 'redis'}],
+	resources: [
+		{
+			name: 'relayControl',
+			nick: 'relays',
+			resex: {
+				relays: [
+					{pin: 11},
+					{pin: 12},
+					{pin: 13},
+					{pin: 14}
+				]
+			}
+		}	
+	],
+
 	skills: [
 	{
 		name: 'boot',
-		emits: ['boot'],
+		emits: ['startUp'],
 		beforeEmit: function(self, message, allDone) {
 			self.resources.globals.cFile = cFile;
 			self.resources.globals.conf = conf;
 			self.resources.globals.conf.relayList = self.resources.globals.conf.relayList || {};
-
 
 			vcb.init(self);
 			support.init(self);
 
 			self.resources.globals.conf = self.resources.globals.cFile.update('relayList', conf.relayList);
 			allDone();
+		}
+	}, 
 
-			// } catch(e) {
-			// 	self.debugLog(`Strange error: ${e}`, 4);
-			// 			allDone();
-			// }
-			// });
+	{
+		name: 'eval',
+		hears: ['startUp'],
+		emits: ['suicide'],
+		skillex: {
+			startUp: function(self, message, allDone) {
+				self.debugLog('About to call status', 1.9)
+				self.resources.relays.status();
 			}
+		}
+	}, 
 
-	},{
-		name: 'interval',
-			hears: ['action', 'clear'],
-			emits: ['heartbeat'],
-			beforeEmit: function(self, message, allDone) {
-				if (self.resources.globals.enableFlag) allDone()
-				else allDone(false, false);
-			},
-			skillex: { 
-				startOn: 'clear',
-				stopOn: 'action',
-				timers: [{ms: 1000, emit: 'heartbeat'}]
-			}
+	{
+		name: 'die',
+		hears: ['suicide']
+	},
 
-	}, {
-			name: 'timeout',
-			hears: ['action'],
-			emits: ['clear'],
-			skillex: {
-				timers: [
-					{ms: 1500, startOn: 'action', emit: 'clear'}
-				]
-			}
-
-	}, {
-			name: 'actuator',
-			hears: ['heartbeat'],
-			emits: ['action', 'statusUpdate']
-
-	}, {
+	{
 			name: 'eval',
 			hears: ['newSubscriber', 'statusUpdate'],
 			skillex: {
@@ -128,13 +124,12 @@ exports.neuron = {
 	],
 	vocab: {
 		beforeHelp: vcb.beforeHelp,
-		evaluations: [
-		{
-			inarray: ['closeall', 'stop'],
-			handler: vcb.close
-		}
-		],
 		lexicon: {
+			stop: {
+				nick: 'stop',
+				help: NYI,
+				handler: vcb.stop
+			},
 			name: {
 				nick: 'name',
 				help: NYI,
@@ -149,7 +144,7 @@ exports.neuron = {
 				help: NYI,
 				parameters: [
 				{nick: 'relay'},
-				{nick: 'status'} 
+				{nick: 'state'} 
 				],
 				handler: vcb.turn
 			},
