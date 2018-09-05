@@ -1,10 +1,10 @@
 const myName = 'relayManager',
 	debug = (process.argv[3] == 'debug'),
-	// gpio = require('onoff').Gpio,
 	support = require('./lib/support'),
 	vcb = require('./lib/vocab'),
 	NYI = 'Not Yet Implemented',
 	// errMsgs = {},
+	//Must Update confTemplate before first Boot
 	confTemplate = {
 		uplinkHost: '127.0.0.1',
 		uplinkPort: 8000,
@@ -141,7 +141,7 @@ exports.neuron = {
 			},
 			turn: {
 				nick: 'turn',
-				help: NYI,
+				help: 'Turn (relay ID) (on/off)',
 				parameters: [
 				{nick: 'relay'},
 				{nick: 'state'} 
