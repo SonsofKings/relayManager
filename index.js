@@ -36,6 +36,8 @@ exports.neuron = {
 			config.interneuron.connectTo.host = conf.uplinkHost;
 			config.interneuron.connectTo.port = conf.uplinkPort;
 
+			globals.cFile = cFile;
+			globals.conf = conf;
 			globals.relayCount = conf.relayList.length;
 			globals.support = support;
 			globals.vcb = vcb;
@@ -92,7 +94,7 @@ exports.neuron = {
 			self.resources.globals.conf = conf;
 			self.resources.globals.conf.relayList = self.resources.globals.conf.relayList || {};
 
-			vcb.init(self);
+			vcb.init(self, conf);
 			support.init(self);
 
 			self.resources.globals.conf = self.resources.globals.cFile.update('relayList', conf.relayList);
@@ -147,7 +149,7 @@ exports.neuron = {
 				{nick: 'rID'},
 				{nick: 'newNick'}
 				],
-				handler: vcb.nameRelay
+				handler: vcb.name
 			},
 			turn: {
 				nick: 'turn',
