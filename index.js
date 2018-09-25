@@ -70,6 +70,16 @@ exports.neuron = {
 					{pin: 14}
 				]
 			}
+		},
+		{
+			name: 'fileCollection',
+			nick: 'fileCollection',
+			resex: {
+				filePath: [
+					'{{neuronRoot}}/lib/relayCollection.js'
+				]
+			}
+
 		}	
 	],
 
@@ -126,16 +136,16 @@ exports.neuron = {
 		beforeHelp: vcb.beforeHelp,
 		lexicon: {
 			stop: {
-				nick: 'stop',
-				help: NYI,
-				handler: vcb.stop
+				nick: 'kill',
+				help: 'Turn off all relays',
+				handler: vcb.kill
 			},
 			name: {
 				nick: 'name',
-				help: NYI,
+				help: 'Name (rID) (newNick)',
 				parameters: [
-				{nick: 'relayName'},
-				{nick: 'pinNum'}
+				{nick: 'rID'},
+				{nick: 'newNick'}
 				],
 				handler: vcb.nameRelay
 			},
