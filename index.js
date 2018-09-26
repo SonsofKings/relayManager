@@ -137,7 +137,7 @@ exports.neuron = {
 	vocab: {
 		beforeHelp: vcb.beforeHelp,
 		lexicon: {
-			stop: {
+			kill: {
 				nick: 'kill',
 				help: 'Turn off all relays',
 				handler: vcb.kill
