@@ -110,7 +110,6 @@ exports.neuron = {
 		skillex: {
 			startUp: function(self, message, allDone) {
 				self.debugLog('About to call status', 1.9)
-				self.resources.relays.status();
 			},
 			newSubscriber: function(self, message, allDone) {
 				self.debugLog('New subscriber: ' + JSON.stringify(message, null, '\t'), 1.9, allDone);
