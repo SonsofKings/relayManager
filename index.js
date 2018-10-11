@@ -10,10 +10,10 @@ const myName = 'relayManager',
 		uplinkPort: 8000,
 		ivKey: 'passw0rd',
 		relayList: [
-			{name: 'relay-1'},
-			{name: 'relay-2'},
-			{name: 'relay-3'},
-			{name: 'relay-4'}
+			{rID: 0, relayName: 'relay-1', pin: 11, state: off},
+			{rID: 1, relayName: 'relay-2', pin: 12, state: off},
+			{rID: 2, relayName: 'relay-3', pin: 13, state: off},
+			{rID: 3, relayName: 'relay-4', pin: 14, state: off}
 		]
 	};
 let 
@@ -27,10 +27,15 @@ exports.neuron = {
 		outputDebugAt: (debug) ? 0 : 5,
 		version: '1.0',
 		beforeBoot: function(config, dispatcher, globals, allDone) {
+			let rlys = config.resources[0].resex.relays;
 			cFile = dispatcher.utilities.configFile;
 			conf = cFile.get(confTemplate);
 
-			console.log(conf);			
+			console.log(conf);		
+
+			for (let i=0; i<conf.relayList.length; i++) {
+				rlys[i] = {pin: conf.relayList[i].pin};
+			}	
 
 			config.interneuron.ivKey = conf.ivKey;
 			config.interneuron.connectTo.host = conf.uplinkHost;
@@ -65,12 +70,7 @@ exports.neuron = {
 			name: 'relayControl',
 			nick: 'relays',
 			resex: {
-				relays: [
-					{pin: 11},
-					{pin: 12},
-					{pin: 13},
-					{pin: 14}
-				]
+				relays: []
 			}
 		},
 		{
@@ -97,6 +97,7 @@ exports.neuron = {
 			vcb.init(self, conf);
 			support.init(self);
 
+
 			self.resources.globals.conf = self.resources.globals.cFile.update('relayList', conf.relayList);
 			allDone();
 		}
@@ -104,35 +105,22 @@ exports.neuron = {
 
 	{
 		name: 'eval',
-		hears: ['startUp'],
-		emits: ['suicide'],
+		hears: ['startUp', 'newSubscriber', 'statusUpdate'],
+		emits: [],
 		skillex: {
 			startUp: function(self, message, allDone) {
 				self.debugLog('About to call status', 1.9)
 				self.resources.relays.status();
+			},
+			newSubscriber: function(self, message, allDone) {
+				self.debugLog('New subscriber: ' + JSON.stringify(message, null, '\t'), 1.9, allDone);
+			},
+
+			statusUpdate: function(self, message, allDone) {
+				self.debugLog('statusUpdate: ' + JSON.stringify(message, null, '\t'), 1.9);
 			}
 		}
-	}, 
-
-	{
-		name: 'die',
-		hears: ['suicide']
-	},
-
-	{
-			name: 'eval',
-			hears: ['newSubscriber', 'statusUpdate'],
-			skillex: {
-				newSubscriber: function(self, message, allDone) {
-					self.debugLog('New subscriber: ' + JSON.stringify(message, null, '\t'), 1.9, allDone);
-				},
-
-				statusUpdate: function(self, message, allDone) {
-					self.debugLog('statusUpdate: ' + JSON.stringify(message, null, '\t'), 1.9);
-				}
-			}
-
-		}
+	}
 	],
 	vocab: {
 		beforeHelp: vcb.beforeHelp,
@@ -165,6 +153,12 @@ exports.neuron = {
 				help: NYI,
 				parameters: [{nick: 'all', optional: true}],
 				handler: vcb.status
+			},
+			relays: {
+				nick: 'relays',
+				help: NYI,
+				parameters: false,
+				handler: vcb.relays
 			}
 		}
 	}
