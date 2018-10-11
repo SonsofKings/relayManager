@@ -10,10 +10,10 @@ const myName = 'relayManager',
 		uplinkPort: 8000,
 		ivKey: 'passw0rd',
 		relayList: [
-			{rID: 0, relayName: 'relay-1', pin: 11, state: off},
-			{rID: 1, relayName: 'relay-2', pin: 12, state: off},
-			{rID: 2, relayName: 'relay-3', pin: 13, state: off},
-			{rID: 3, relayName: 'relay-4', pin: 14, state: off}
+			{rID: 0, relayName: 'relay-1', pin: 11, state: "off"},
+			{rID: 1, relayName: 'relay-2', pin: 12, state: "off"},
+			{rID: 2, relayName: 'relay-3', pin: 13, state: "off"},
+			{rID: 3, relayName: 'relay-4', pin: 14, state: "off"}
 		]
 	};
 let 
