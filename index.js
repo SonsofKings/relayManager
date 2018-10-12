@@ -43,7 +43,6 @@ exports.neuron = {
 			//Establish Globals
 			globals.cFile = cFile;
 			globals.conf = conf;
-			globals.relayCount = conf.relayList.length;
 			globals.vcb = vcb;
 			allDone(false, config, dispatcher, globals);
 		}
