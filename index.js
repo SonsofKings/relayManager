@@ -132,12 +132,6 @@ exports.neuron = {
 				],
 				handler: vcb.turn
 			},
-			status: {
-				nick: 'status',
-				help: NYI,
-				parameters: [{nick: 'all', optional: true}],
-				handler: vcb.status
-			},
 			relays: {
 				nick: 'relays',
 				help: 'Returns all known information about current relays',
