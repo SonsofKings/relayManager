@@ -162,7 +162,7 @@ exports.neuron = {
 			setpin: {
 				nick: 'setpin',
 				help: 'Set (relay) to watch (GPIOPIN# 9P Standard)',
-				parameter: [{nick: relay}, {nick: pin}],
+				parameter: [{nick: "relay"}, {nick: "pin"}],
 				handler: vcb.setpin
 			}
 		}
