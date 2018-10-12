@@ -155,9 +155,15 @@ exports.neuron = {
 			},
 			relays: {
 				nick: 'relays',
-				help: NYI,
+				help: 'Returns all known information about current relays',
 				parameters: false,
 				handler: vcb.relays
+			},
+			setpin: {
+				nick: 'setpin',
+				help: 'Set (relay) to watch (GPIOPIN# 9P Standard)',
+				parameter: [{nick: relay}, {nick: pin}],
+				handler: vcb.setpin
 			}
 		}
 	}
