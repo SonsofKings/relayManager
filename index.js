@@ -1,10 +1,8 @@
 const myName = 'relayManager',
 	debug = (process.argv[3] == 'debug'),
-	support = require('./lib/support'),
 	vcb = require('./lib/vocab'),
 	NYI = 'Not Yet Implemented',
-	// errMsgs = {},
-	//Must Update confTemplate before first Boot
+	//Must Update confTemplate uPort and uHost before first Boot
 	confTemplate = {
 		uplinkHost: '127.0.0.1',
 		uplinkPort: 8000,
@@ -27,20 +25,22 @@ exports.neuron = {
 		outputDebugAt: (debug) ? 0 : 5,
 		version: '1.0',
 		beforeBoot: function(config, dispatcher, globals, allDone) {
+			//Set Tools
 			let rlys = config.resources[0].resex.relays;
 			cFile = dispatcher.utilities.configFile;
-			conf = cFile.get(confTemplate);
+			conf = cFile.get(confTemplate);		
 
-			console.log(conf);		
-
+			//Push Resource Requirements
 			for (let i=0; i<conf.relayList.length; i++) {
 				rlys[i] = {pin: conf.relayList[i].pin};
 			}	
 
+			//Establish Connection Points
 			config.interneuron.ivKey = conf.ivKey;
 			config.interneuron.connectTo.host = conf.uplinkHost;
 			config.interneuron.connectTo.port = conf.uplinkPort;
 
+			//Establish Globals
 			globals.cFile = cFile;
 			globals.conf = conf;
 			globals.relayCount = conf.relayList.length;
@@ -72,45 +72,31 @@ exports.neuron = {
 			resex: {
 				relays: []
 			}
-		},
-		{
-			name: 'fileCollection',
-			nick: 'fileCollection',
-			resex: {
-				filePath: [
-					'{{neuronRoot}}/lib/relayCollection.js'
-				]
-			}
-
 		}	
 	],
 
 	skills: [
 	{
 		name: 'boot',
-		emits: ['startUp'],
+		emits: ['awake'],
 		beforeEmit: function(self, message, allDone) {
+			//Establish Living Config
 			self.resources.globals.cFile = cFile;
 			self.resources.globals.conf = conf;
-			self.resources.globals.conf.relayList = self.resources.globals.conf.relayList || {};
 
+			//Pass Self to Vocab
 			vcb.init(self, conf);
-			support.init(self);
 
-
-			self.resources.globals.conf = self.resources.globals.cFile.update('relayList', conf.relayList);
+			//Finish Boot
 			allDone();
 		}
 	}, 
 
 	{
 		name: 'eval',
-		hears: ['startUp', 'newSubscriber', 'statusUpdate'],
+		hears: ['newSubscriber', 'statusUpdate'],
 		emits: [],
 		skillex: {
-			startUp: function(self, message, allDone) {
-				self.debugLog('About to call status', 1.9)
-			},
 			newSubscriber: function(self, message, allDone) {
 				self.debugLog('New subscriber: ' + JSON.stringify(message, null, '\t'), 1.9, allDone);
 			},
